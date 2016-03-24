@@ -2,12 +2,66 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>SSHFS Lock Up Demo</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+    <div>
+      This app is meant to demonstrate Atom locking up when calling
+      fs.readdirSync for a directory within an SSHFS mount.
+    </div>
+
+    <ol>
+      <li>
+        Install <a href="https://https://osxfuse.github.io/">OSXFuse<a>
+      </li>
+      <li>
+        Install <a href="https://github.com/osxfuse/sshfs/releases">SSHFS</a>
+      </li>
+      <li>
+        Create an SSHFS mount pointed at an SSH server you have access to.
+        I used a Digital Ocean droplet as my ssh server...
+
+        <pre>
+          mkdir ~/SSHFS
+          sshfs root@x.x.x.x: ~/SSHFS
+        </pre>
+      </li>
+      <li>
+        Create a directory on the SSH mount.
+
+        <pre>
+          mkdir ~/SSHFS/foo
+          mkdir ~/SSHFS/foo/bar
+        </pre>
+      </li>
+      <li>
+        Type the path to this directory in the field and click the button.
+      </li>
+      <li>
+        Verify in the dev tools it logs the contents.
+      </li>
+      <li>
+        Now turn on the timeline or profiler and click the button.
+      </li>
+      <li>
+        On my machine this works with local directories, but hangs on anything within an SSHFS mount.
+      </li>
+    </ol>
+
+    <input id='path'>
+    <button id='button'>Click to call readdirSync with this path</button>
   </body>
 </html>
+
+<script>
+'use strict'
+
+const fs = require('fs')
+
+const input = document.getElementById('path')
+const button = document.getElementById('button')
+
+button.addEventListener('click', function () {
+  console.log(fs.readdirSync(input.value))
+})
+</script>
